@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Espace Moto — AchkounE</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{
+  font-family:'Poppins',-apple-system,'Segoe UI',Arial,sans-serif;
+  background:linear-gradient(160deg,#ede9fe 0%,#f5f3ff 45%,#faf9ff 100%);
+  color:#1e293b;min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;
+  padding:26px 16px 50px;
+}
+.wrap{width:100%;max-width:420px;}
+
+/* ── Login ── */
+.login-card{
+  background:white;border-radius:24px;padding:28px 22px;
+  box-shadow:0 8px 28px rgba(76,29,149,0.14);border:1px solid #ede9fe;
+  text-align:center;
+}
+.login-card .ico{font-size:44px;margin-bottom:10px;}
+.login-card h1{font-size:19px;font-weight:800;color:#4c1d95;margin-bottom:4px;}
+.login-card p{font-size:12.5px;color:#64748b;line-height:1.5;margin-bottom:20px;}
+.login-card input{
+  width:100%;padding:14px 16px;border-radius:14px;border:1.5px solid #e2e8f0;
+  font-size:15px;text-align:center;letter-spacing:1px;font-weight:700;
+  color:#1e293b;font-family:inherit;margin-bottom:12px;
+}
+.login-card input:focus{outline:none;border-color:#a78bfa;}
+.login-card .err{font-size:12px;color:#dc2626;min-height:16px;margin-bottom:8px;}
+.btn{
+  width:100%;padding:14px;border:none;border-radius:14px;
+  background:linear-gradient(135deg,#7c3aed,#5b21b6);color:white;
+  font-size:14.5px;font-weight:800;cursor:pointer;font-family:inherit;
+  box-shadow:0 4px 14px rgba(124,58,237,0.35);
+}
+.btn:disabled{opacity:.55;box-shadow:none;}
+.btn:active{transform:scale(0.98);}
+.spinner{
+  display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.45);
+  border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;
+  vertical-align:middle;margin-right:7px;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ── Planning ── */
+.hdr{text-align:center;margin-bottom:18px;}
+.hdr .ico{font-size:38px;margin-bottom:6px;}
+.hdr h1{font-size:19px;font-weight:800;color:#4c1d95;}
+.hdr .hello{font-size:12.5px;color:#64748b;margin-top:4px;}
+
+.slot-card{
+  background:white;border-radius:16px;padding:14px 16px;margin-bottom:10px;
+  box-shadow:0 3px 12px rgba(76,29,149,0.07);border:1px solid #ede9fe;
+  display:flex;align-items:center;gap:14px;border-left:4px solid #7c3aed;
+}
+.slot-date{
+  background:#ede9fe;border-radius:12px;padding:8px 10px;text-align:center;min-width:52px;
+}
+.slot-date .d{font-size:18px;font-weight:800;color:#5b21b6;line-height:1;}
+.slot-date .m{font-size:10px;color:#7c3aed;font-weight:700;text-transform:uppercase;margin-top:2px;}
+.slot-info .h{font-size:15px;font-weight:700;color:#1e293b;}
+.slot-info .sub{font-size:11.5px;color:#94a3b8;margin-top:2px;}
+
+.empty-msg{
+  text-align:center;padding:40px 20px;color:#94a3b8;font-size:13px;
+}
+.empty-msg .ico{font-size:36px;margin-bottom:10px;display:block;}
+
+.full-space-link{
+  display:block;text-align:center;margin-top:18px;padding:14px;
+  background:white;border:1.5px solid #ddd6fe;border-radius:14px;
+  color:#5b21b6;font-weight:700;font-size:13.5px;text-decoration:none;
+}
+.full-space-link:active{background:#faf9ff;}
+
+.logout{
+  display:block;text-align:center;margin-top:16px;font-size:12px;color:#94a3b8;
+  text-decoration:underline;cursor:pointer;
+}
+.guest-note{
+  font-size:11px;color:#9a3412;background:#fff7ed;border:1px solid #fed7aa;
+  border-radius:12px;padding:10px 12px;line-height:1.5;margin-bottom:16px;text-align:center;
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div id="login-screen">
+    <div class="login-card">
+      <div class="ico">🏍️</div>
+      <h1>Espace Moto</h1>
+      <p>Consulte les créneaux Moto programmés.<br>Entre ton code d'accès (ton n° d'auth habituel, ou le code invité communiqué par l'auto-école).</p>
+      <input type="text" id="input-code" placeholder="Code d'accès" autocapitalize="characters" autocomplete="off">
+      <div class="err" id="login-err"></div>
+      <button class="btn" id="btn-login">Accéder au planning</button>
+    </div>
+  </div>
+
+  <div id="planning-screen" style="display:none;">
+    <div class="hdr">
+      <div class="ico">🏍️</div>
+      <h1>Planning Moto</h1>
+      <div class="hello" id="hello-txt"></div>
+    </div>
+
+    <div class="guest-note" id="guest-note" style="display:none;">
+      👋 Accès invité — cette page affiche uniquement les créneaux Moto.
+    </div>
+
+    <div id="slots-list"><div class="empty-msg"><span class="spinner" style="border-top-color:#7c3aed;border-color:rgba(124,58,237,.25);"></span></div></div>
+
+    <a href="index.html" class="full-space-link" id="full-space-link" style="display:none;">
+      → Accéder à mon espace complet (paiements, séances…)
+    </a>
+
+    <div class="logout" id="btn-logout">Changer de code</div>
+  </div>
+
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import {
+  getFirestore, collection, query, where, getDocs
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+var firebaseConfig = {
+  apiKey: "AIzaSyCeqD1MEDQyYFViCRG88xqjBcnsLtcsTa0",
+  authDomain: "achkoune-app.firebaseapp.com",
+  projectId: "achkoune-app",
+  storageBucket: "achkoune-app.firebasestorage.app",
+  messagingSenderId: "25360989092",
+  appId: "1:25360989092:web:3f762f64c360884c50df31"
+};
+var app = initializeApp(firebaseConfig);
+var db  = getFirestore(app);
+
+/* ── Identifiants Moto reconnus (mêmes constantes que index__76_.html) ── */
+var MOTO_NOMS = ["moto moto"];
+
+/* ── Code invité partagé — à changer ici quand tu veux le renouveler ── */
+var GUEST_PASSWORD = "MOTOGUEST2026";
+
+var MOIS = ["Jan","Fév","Mar","Avr","Mai","Jun","Jul","Aoû","Sep","Oct","Nov","Déc"];
+
+function setErr(msg) { document.getElementById("login-err").textContent = msg || ""; }
+
+document.getElementById("btn-login").addEventListener("click", function() {
+  var raw = document.getElementById("input-code").value.trim();
+  if (!raw) { setErr("Entre un code d'accès."); return; }
+  setErr("");
+  var btn = document.getElementById("btn-login");
+  btn.disabled = true;
+  btn.innerHTML = "<span class='spinner'></span> Vérification…";
+
+  if (raw.toLowerCase() === GUEST_PASSWORD.toLowerCase()) {
+    enterPlanning({ mode: "guest" });
+    return;
+  }
+
+  lookupClient(raw).then(function(client) {
+    if (client) {
+      enterPlanning({ mode: "client", client: client });
+    } else {
+      setErr("Code invalide. Vérifie ton n° d'auth ou le code invité.");
+      btn.disabled = false;
+      btn.textContent = "Accéder au planning";
+    }
+  }).catch(function(e) {
+    console.error(e);
+    setErr("Erreur de connexion, réessaie.");
+    btn.disabled = false;
+    btn.textContent = "Accéder au planning";
+  });
+});
+
+document.getElementById("input-code").addEventListener("keydown", function(e) {
+  if (e.key === "Enter") document.getElementById("btn-login").click();
+});
+
+function lookupClient(serial) {
+  return getDocs(query(collection(db, "clients"), where("serial", "==", serial)))
+    .then(function(snap) {
+      var found = null;
+      snap.forEach(function(d) { found = d.data(); found.id = d.id; });
+      if (found) return found;
+      /* repli insensible à la casse si aucune correspondance exacte */
+      return getDocs(collection(db, "clients")).then(function(allSnap) {
+        var f2 = null;
+        allSnap.forEach(function(d) {
+          var data = d.data();
+          if ((data.serial || "").toLowerCase() === serial.toLowerCase()) { f2 = data; f2.id = d.id; }
+        });
+        return f2;
+      });
+    });
+}
+
+function enterPlanning(ctx) {
+  document.getElementById("login-screen").style.display = "none";
+  document.getElementById("planning-screen").style.display = "block";
+
+  var helloEl = document.getElementById("hello-txt");
+  if (ctx.mode === "client") {
+    var nom = ctx.client.prenom ? ctx.client.prenom + " " + (ctx.client.nom || "") : (ctx.client.nom || "");
+    helloEl.textContent = "Bonjour " + nom.trim();
+    document.getElementById("full-space-link").style.display = "block";
+  } else {
+    helloEl.textContent = "";
+    document.getElementById("guest-note").style.display = "block";
+  }
+
+  loadMotoSlots();
+}
+
+function loadMotoSlots() {
+  var listEl = document.getElementById("slots-list");
+  getDocs(collection(db, "planning_seances")).then(function(snap) {
+    var today = new Date();
+    var todayMs = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
+    var slots = [];
+
+    snap.forEach(function(d) {
+      var s = d.data();
+      var prenom = (s.prenom || "").trim().toLowerCase();
+      var nom = (s.nom || "").trim().toLowerCase();
+      var nomComplet = (prenom + " " + nom).replace(/\s+/g, " ").trim();
+      if (MOTO_NOMS.indexOf(nomComplet) === -1) return;
+
+      var parts = (s.dateKey || "").split("-");
+      if (parts.length !== 3) return;
+      var sDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+      if (sDate.getTime() < todayMs) return;
+
+      s._date = sDate;
+      slots.push(s);
+    });
+
+    slots.sort(function(a, b) { return a._date - b._date || (a.heure < b.heure ? -1 : 1); });
+
+    if (slots.length === 0) {
+      listEl.innerHTML = "<div class='empty-msg'><span class='ico'>📭</span>Aucun créneau Moto programmé pour le moment.</div>";
+      return;
+    }
+
+    var h = "";
+    for (var i = 0; i < slots.length; i++) {
+      var s = slots[i];
+      h += "<div class='slot-card'>"
+        + "<div class='slot-date'><div class='d'>" + s._date.getDate() + "</div><div class='m'>" + MOIS[s._date.getMonth()] + "</div></div>"
+        + "<div class='slot-info'><div class='h'>🕐 " + s.heure + "</div><div class='sub'>Séance Moto</div></div>"
+        + "</div>";
+    }
+    listEl.innerHTML = h;
+  }).catch(function(e) {
+    console.error(e);
+    listEl.innerHTML = "<div class='empty-msg'>Erreur de chargement, réessaie plus tard.</div>";
+  });
+}
+
+document.getElementById("btn-logout").addEventListener("click", function() {
+  document.getElementById("planning-screen").style.display = "none";
+  document.getElementById("login-screen").style.display = "block";
+  document.getElementById("input-code").value = "";
+  document.getElementById("guest-note").style.display = "none";
+  document.getElementById("full-space-link").style.display = "none";
+  setErr("");
+  var btn = document.getElementById("btn-login");
+  btn.disabled = false;
+  btn.textContent = "Accéder au planning";
+});
+</script>
+</body>
+</html>
